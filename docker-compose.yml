@@ -28,15 +28,12 @@ services:
       - ./backend/.env
     environment:
       - MONGO_URI=mongodb://mongo:27017/agentic-care
-      - NODE_ENV=development
+      - NODE_ENV=production
     depends_on:
       mongo:
         condition: service_healthy
     networks:
       - agentic-network
-    volumes:
-      - ./backend:/app
-      - /app/node_modules
 
   frontend:
     build:
