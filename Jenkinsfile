@@ -17,7 +17,7 @@ pipeline {
         stage('Build') {
             steps {
                 echo 'Building Docker images...'
-                sh 'docker compose build --no-cache'
+                sh 'docker compose build'
             }
         }
 
@@ -36,7 +36,7 @@ pipeline {
                 branch 'main'
             }
             steps {
-                echo 'Deploy stage - configure Render hooks when ready'
+                echo 'Deploy stage - Render hooks will go here'
             }
         }
     }
@@ -47,9 +47,11 @@ pipeline {
         }
         failure {
             echo 'Pipeline failed — check logs above.'
+            sh 'docker compose logs --tail=30'
         }
         always {
-            echo 'Done.'
+            echo 'Cleaning up...'
+            sh 'docker compose down || true'
         }
     }
 }
