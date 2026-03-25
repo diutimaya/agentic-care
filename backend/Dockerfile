@@ -11,7 +11,9 @@ WORKDIR /app
 RUN addgroup -S appgroup && adduser -S appuser -G appgroup
 
 COPY --from=deps /app/node_modules ./node_modules
-COPY . .
+COPY package.json ./
+COPY server.js ./
+COPY src/ ./src/
 
 RUN chown -R appuser:appgroup /app
 USER appuser
