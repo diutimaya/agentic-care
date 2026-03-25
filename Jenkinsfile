@@ -14,6 +14,22 @@ pipeline {
             }
         }
 
+        stage('Setup Env') {
+            steps {
+                echo 'Creating environment files...'
+                sh '''
+                    cat > backend/.env << EOF
+PORT=5000
+MONGO_URI=mongodb://mongo:27017/agentic-care
+JWT_SECRET=super_secret_jenkins_key_change_in_prod
+JWT_EXPIRES_IN=7d
+CLIENT_URL=http://localhost:3000
+NODE_ENV=production
+EOF
+                '''
+            }
+        }
+
         stage('Build') {
             steps {
                 echo 'Building Docker images...'
@@ -25,7 +41,7 @@ pipeline {
             steps {
                 echo 'Starting containers...'
                 sh 'docker compose up -d'
-                sh 'sleep 15'
+                sh 'sleep 20'
                 sh 'curl -f http://host.docker.internal:5000/health || exit 1'
                 echo 'Health check passed!'
             }
@@ -47,7 +63,7 @@ pipeline {
         }
         failure {
             echo 'Pipeline failed — check logs above.'
-            sh 'docker compose logs --tail=30'
+            sh 'docker compose logs --tail=30 || true'
         }
         always {
             echo 'Cleaning up...'
