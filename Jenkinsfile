@@ -38,12 +38,12 @@ EOF
         }
 
         stage('Test') {
-            steps {
-                echo 'Starting containers...'
-                sh 'docker compose up -d'
-                sh 'sleep 20'
-                sh 'curl -f http://host.docker.internal:5000/health || exit 1'
-                echo 'Health check passed!'
+    steps {
+        echo 'Starting containers...'
+        sh 'docker compose up -d'
+        sh 'sleep 20'
+        sh 'docker compose exec -T backend curl -f http://localhost:5000/health || exit 1'
+        echo 'Health check passed!'
             }
         }
 
