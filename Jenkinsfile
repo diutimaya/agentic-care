@@ -3,8 +3,6 @@ pipeline {
 
     environment {
         COMPOSE_PROJECT_NAME = 'agentic-care'
-        RENDER_BACKEND_HOOK  = credentials('RENDER_BACKEND_HOOK')
-        RENDER_FRONTEND_HOOK = credentials('RENDER_FRONTEND_HOOK')
     }
 
     stages {
@@ -25,11 +23,11 @@ pipeline {
 
         stage('Test') {
             steps {
-                echo 'Running health checks...'
+                echo 'Starting containers...'
                 sh 'docker compose up -d'
-                sh 'sleep 10'
-                sh 'curl -f http://localhost:5000/health || exit 1'
-                echo 'All health checks passed!'
+                sh 'sleep 15'
+                sh 'curl -f http://host.docker.internal:5000/health || exit 1'
+                echo 'Health check passed!'
             }
         }
 
@@ -38,10 +36,7 @@ pipeline {
                 branch 'main'
             }
             steps {
-                echo 'Deploying to Render...'
-                sh 'curl -X POST $RENDER_BACKEND_HOOK'
-                sh 'curl -X POST $RENDER_FRONTEND_HOOK'
-                echo 'Deploy hooks triggered!'
+                echo 'Deploy stage - configure Render hooks when ready'
             }
         }
     }
@@ -52,11 +47,9 @@ pipeline {
         }
         failure {
             echo 'Pipeline failed — check logs above.'
-            sh 'docker compose logs --tail=50'
         }
         always {
-            echo 'Cleaning up containers...'
-            sh 'docker compose down'
+            echo 'Done.'
         }
     }
 }
